@@ -8,6 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Доходы</title>
   <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="/icon-180.png">
   <style>
     * {
       box-sizing: border-box;
@@ -46,6 +47,10 @@
       color: #007AFF;
       cursor: pointer;
       font-size: 18px;
+    }
+    .top-title {
+      font-size: 17px;
+      font-weight: 600;
     }
     .main-content {
       padding-top: 60px;
@@ -248,7 +253,7 @@
 <body>
   <div class="top-bar">
     <button class="top-btn" id="back-btn" style="display:none;" onclick="goBack()">&lt;</button>
-    <button class="top-btn" id="add-btn" style="display:none;" onclick="triggerAddAction()">+</button>
+    <div class="top-title" id="page-title">Доходы</div>
     <button class="top-btn" onclick="openSideMenu()">≡</button>
   </div>
 
@@ -282,7 +287,7 @@
   <div id="notification" class="notification">Сохранено!</div>
 
   <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
-  <script src="app.js?v=30"></script>
+  <script src="app.js?v=32"></script>
 
   <script>
     let currentView = 'calendar';
@@ -292,31 +297,20 @@
         closeModal();
         currentView = 'calendar';
         document.getElementById('back-btn').style.display = 'none';
-        document.getElementById('add-btn').style.display = 'none';
+        document.getElementById('page-title').textContent = 'Доходы';
       }
     }
 
-    function setView(view) {
+    function setView(view, title = 'Доходы') {
       currentView = view;
       const backBtn = document.getElementById('back-btn');
-      const addBtn = document.getElementById('add-btn');
+      const pageTitle = document.getElementById('page-title');
       if (view === 'calendar') {
         backBtn.style.display = 'none';
-        addBtn.style.display = 'none';
-      } else if (view === 'clients') {
+        pageTitle.textContent = 'Доходы';
+      } else {
         backBtn.style.display = 'block';
-        addBtn.style.display = 'block';
-        addBtn.onclick = () => openAddClientForm();
-      } else if (view === 'services') {
-        backBtn.style.display = 'block';
-        addBtn.style.display = 'block';
-        addBtn.onclick = () => openAddServiceForm();
-      } else if (view === 'day') {
-        backBtn.style.display = 'block';
-        addBtn.style.display = 'none';
-      } else if (view === 'stats') {
-        backBtn.style.display = 'block';
-        addBtn.style.display = 'none';
+        pageTitle.textContent = title;
       }
     }
 

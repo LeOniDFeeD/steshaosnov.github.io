@@ -10,6 +10,17 @@ const monthNames = [
   'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
 ];
 
+// ✅ Сортировка клиентов по имени (имя + фамилия)
+function sortClientsByName(clientsList) {
+  return clientsList.sort((a, b) => {
+    const nameA = `${a.firstName} ${a.lastName}`.trim().toLowerCase();
+    const nameB = `${b.firstName} ${b.lastName}`.trim().toLowerCase();
+    if (nameA < nameB) return -1;
+    if (nameA > nameB) return 1;
+    return 0;
+  });
+}
+
 async function init() {
   const savedRecords = await localforage.getItem('records');
   const savedServices = await localforage.getItem('services');
@@ -31,6 +42,15 @@ function formatDate(date) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+function formatDayTitle(dateStr) {
+  const date = new Date(dateStr);
+  const day = date.getDate();
+  const monthName = monthNames[date.getMonth()];
+  const weekdays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  const weekday = weekdays[date.getDay()];
+  return `${weekday}, ${day} ${monthName}`;
 }
 
 function getServiceById(id) {
@@ -68,10 +88,13 @@ function sortServices() {
 }
 
 function sortClients() {
+  // ✅ Сортируем по имени
   clients.sort((a, b) => {
-    const nameA = `${a.lastName} ${a.firstName}`.trim();
-    const nameB = `${b.lastName} ${b.firstName}`.trim();
-    return nameA.localeCompare(nameB, 'ru', { sensitivity: 'base' });
+    const nameA = `${a.firstName} ${a.lastName}`.trim().toLowerCase();
+    const nameB = `${b.firstName} ${b.lastName}`.trim().toLowerCase();
+    if (nameA < nameB) return -1;
+    if (nameA > nameB) return 1;
+    return 0;
   });
 }
 
@@ -196,6 +219,10 @@ function openDayModal(dateStr) {
     }
   });
 
+  // ✅ Заголовок дня в шапке
+  const dayTitle = formatDayTitle(dateStr);
+  setView('day', dayTitle);
+
   let html = `<h3>${formattedDate}</h3>`;
   html += `<p><strong>Доход за день: ${dayIncome.toFixed(0)} ₽</strong></p>`;
 
@@ -235,8 +262,9 @@ function openDayModal(dateStr) {
     });
   }
 
-  sortServices();
+  // ✅ Сортируем клиентов по имени перед отображением
   sortClients();
+  sortServices();
 
   let clientOptions = clients.length > 0
     ? clients.map(c => {
@@ -261,7 +289,6 @@ function openDayModal(dateStr) {
   `;
 
   openModal(html);
-  setView('day');
 }
 
 function addServiceField(containerId, isEditing) {
@@ -335,8 +362,8 @@ function editRecord(dateStr, index) {
   if (index >= dayRecords.length) return;
   const record = dayRecords[index];
 
-  sortServices();
   sortClients();
+  sortServices();
 
   let clientOptions = clients.map(c => {
     const name = `${c.firstName} ${c.lastName}`.trim();
@@ -483,7 +510,6 @@ function performMoveRecord(oldDateStr, index) {
     comment: record.comment
   };
 
-  // Удаляем старую запись
   records = records.filter(r => 
     !(r.date === oldDateStr && 
       r.clientId === record.clientId && 
@@ -491,7 +517,6 @@ function performMoveRecord(oldDateStr, index) {
       r.time === record.time)
   );
 
-  // Добавляем новую
   records.push(newRecord);
   localforage.setItem('records', records);
   showNotification('Запись перенесена!');
@@ -501,6 +526,7 @@ function performMoveRecord(oldDateStr, index) {
 
 // === КЛИЕНТЫ ===
 function openClients() {
+  // ✅ Сортируем по имени
   sortClients();
   let listHtml = '';
   if (clients.length > 0) {
@@ -524,7 +550,7 @@ function openClients() {
   `;
 
   openModal(html);
-  setView('clients');
+  setView('clients', 'Клиенты');
 }
 
 function openAddClientForm() {
@@ -635,7 +661,7 @@ function openServices() {
   `;
 
   openModal(html);
-  setView('services');
+  setView('services', 'Услуги');
 }
 
 function openAddServiceForm() {
@@ -801,7 +827,7 @@ function openStats() {
   html += '</div>';
 
   openModal(html);
-  setView('stats');
+  setView('stats', 'Статистика');
 }
 
 // === РЕЗЕРВНОЕ КОПИРОВАНИЕ ===
