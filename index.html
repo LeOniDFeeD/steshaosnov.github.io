@@ -254,7 +254,7 @@
   <div class="top-bar">
     <button class="top-btn" id="back-btn" style="display:none;" onclick="goBack()">&lt;</button>
     <div class="top-title" id="page-title">Доходы</div>
-    <button class="top-btn" onclick="openSideMenu()">≡</button>
+    <button class="top-btn" id="menu-btn" onclick="openSideMenu()">≡</button>
   </div>
 
   <div class="main-content">
@@ -287,7 +287,7 @@
   <div id="notification" class="notification">Сохранено!</div>
 
   <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
-  <script src="app.js?v=32"></script>
+  <script src="app.js?v=35"></script>
 
   <script>
     let currentView = 'calendar';
@@ -296,22 +296,40 @@
       if (currentView !== 'calendar') {
         closeModal();
         currentView = 'calendar';
-        document.getElementById('back-btn').style.display = 'none';
-        document.getElementById('page-title').textContent = 'Доходы';
+        updateHeader();
+      }
+    }
+
+    function updateHeader() {
+      const backBtn = document.getElementById('back-btn');
+      const menuBtn = document.getElementById('menu-btn');
+      const addBtn = document.getElementById('add-btn');
+      const pageTitle = document.getElementById('page-title');
+
+      if (currentView === 'calendar') {
+        // Главный экран: только меню справа
+        backBtn.style.display = 'none';
+        menuBtn.style.display = 'block';
+        if (addBtn) addBtn.style.display = 'none';
+        pageTitle.textContent = 'Доходы';
+      } else if (currentView === 'stats') {
+        // Статистика: только ← назад
+        backBtn.style.display = 'block';
+        menuBtn.style.display = 'none';
+        if (addBtn) addBtn.style.display = 'none';
+        pageTitle.textContent = 'Статистика';
+      } else {
+        // Клиенты / Услуги: ← назад | + добавить
+        backBtn.style.display = 'block';
+        menuBtn.style.display = 'none';
+        if (addBtn) addBtn.style.display = 'block';
+        pageTitle.textContent = currentView === 'clients' ? 'Клиенты' : 'Услуги';
       }
     }
 
     function setView(view, title = 'Доходы') {
       currentView = view;
-      const backBtn = document.getElementById('back-btn');
-      const pageTitle = document.getElementById('page-title');
-      if (view === 'calendar') {
-        backBtn.style.display = 'none';
-        pageTitle.textContent = 'Доходы';
-      } else {
-        backBtn.style.display = 'block';
-        pageTitle.textContent = title;
-      }
+      updateHeader();
     }
 
     function openSideMenu() {
@@ -331,6 +349,15 @@
         openAddServiceForm();
       }
     }
+
+    // Динамическое создание кнопки "+"
+    const addBtn = document.createElement('button');
+    addBtn.className = 'top-btn';
+    addBtn.id = 'add-btn';
+    addBtn.textContent = '+';
+    addBtn.onclick = triggerAddAction;
+    addBtn.style.display = 'none';
+    document.querySelector('.top-bar').appendChild(addBtn);
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js?v=1').catch(console.warn);

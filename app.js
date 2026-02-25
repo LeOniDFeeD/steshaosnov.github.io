@@ -10,7 +10,6 @@ const monthNames = [
   'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
 ];
 
-// ✅ Сортировка клиентов по имени (имя + фамилия)
 function sortClientsByName(clientsList) {
   return clientsList.sort((a, b) => {
     const nameA = `${a.firstName} ${a.lastName}`.trim().toLowerCase();
@@ -88,7 +87,6 @@ function sortServices() {
 }
 
 function sortClients() {
-  // ✅ Сортируем по имени
   clients.sort((a, b) => {
     const nameA = `${a.firstName} ${a.lastName}`.trim().toLowerCase();
     const nameB = `${b.firstName} ${b.lastName}`.trim().toLowerCase();
@@ -219,7 +217,6 @@ function openDayModal(dateStr) {
     }
   });
 
-  // ✅ Заголовок дня в шапке
   const dayTitle = formatDayTitle(dateStr);
   setView('day', dayTitle);
 
@@ -262,7 +259,6 @@ function openDayModal(dateStr) {
     });
   }
 
-  // ✅ Сортируем клиентов по имени перед отображением
   sortClients();
   sortServices();
 
@@ -468,7 +464,6 @@ function deleteRecord(dateStr, index) {
   openDayModal(dateStr);
 }
 
-// ✅ ПЕРЕНОС ЗАПИСИ
 function moveRecord(oldDateStr, index) {
   const dayRecords = records.filter(r => r.date === oldDateStr);
   if (index >= dayRecords.length) return;
@@ -526,7 +521,6 @@ function performMoveRecord(oldDateStr, index) {
 
 // === КЛИЕНТЫ ===
 function openClients() {
-  // ✅ Сортируем по имени
   sortClients();
   let listHtml = '';
   if (clients.length > 0) {
@@ -550,7 +544,7 @@ function openClients() {
   `;
 
   openModal(html);
-  setView('clients', 'Клиенты');
+  setView('clients');
 }
 
 function openAddClientForm() {
@@ -661,7 +655,7 @@ function openServices() {
   `;
 
   openModal(html);
-  setView('services', 'Услуги');
+  setView('services');
 }
 
 function openAddServiceForm() {
@@ -827,7 +821,7 @@ function openStats() {
   html += '</div>';
 
   openModal(html);
-  setView('stats', 'Статистика');
+  setView('stats');
 }
 
 // === РЕЗЕРВНОЕ КОПИРОВАНИЕ ===
